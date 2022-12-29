@@ -46,7 +46,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private Texture[] mapTiles;
     private ZoomXY beginTile;   // top left tile
 
-    private final int NUM_TILES = 5;
+    private final int NUM_TILES = 3;
     private final int ZOOM = 15;
     private final Geolocation CENTER_GEOLOCATION = new Geolocation(46.557314, 15.637771);
     private final Geolocation MARKER_GEOLOCATION = new Geolocation(46.559070, 15.638100);
