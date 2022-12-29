@@ -1,13 +1,25 @@
 package eu.smltg.mapapp.locations;
 
+import com.google.gson.Gson;
+
+import java.io.IOException;
+
+import eu.smltg.mapapp.Const;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class Restaurant {
 
-    Location location;
-    String _id;
-    String name;
-    String address;
-    String dataSeries;
-    Integer __v;
+    public Location location;
+    public String _id;
+    public String name;
+    public String address;
+    public String dataSeries;
+    public Integer __v ;
+    public String smth;
+
 
     /*"_id": "6278fb184365cb3b54730bd6",
     "name": "Zlati Lev",
@@ -19,6 +31,27 @@ public class Restaurant {
     @Override
     public String toString() {
         return this.name + " + " + this.location.toString() + "i";
+    }
+
+    public static Restaurant[] getRestaurantsAPI() throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(Const.apiLink + "/restaurants")
+                .build();
+
+        Call call = client.newCall(request);
+        Response response = call.execute();
+
+        if(response.body() != null){
+            String responseRes = response.body().string();
+
+            Gson gson = new Gson();
+
+            return gson.fromJson(responseRes, Restaurant[].class);
+        }else{
+            return new Restaurant[]{};
+        }
+
     }
 
 }

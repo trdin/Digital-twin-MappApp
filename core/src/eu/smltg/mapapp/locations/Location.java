@@ -2,7 +2,7 @@ package eu.smltg.mapapp.locations;
 
 public class Location {
     String type;
-    Double[] coordinates;
+    public Double[] coordinates;
 
     @Override
     public String toString() {
