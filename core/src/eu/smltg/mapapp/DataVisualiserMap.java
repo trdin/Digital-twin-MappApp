@@ -19,14 +19,21 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 
+import eu.smltg.mapapp.locations.Restaurant;
 import eu.smltg.mapapp.utils.Geolocation;
 import eu.smltg.mapapp.utils.MapRasterTiles;
 import eu.smltg.mapapp.utils.PixelPosition;
 import eu.smltg.mapapp.utils.ZoomXY;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class DataVisualiserMap extends ApplicationAdapter implements GestureDetector.GestureListener {
 
@@ -47,6 +54,8 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 	private final int WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
 	private final int HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
 
+	private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
+
 	@Override
 	public void create() {
 		shapeRenderer = new ShapeRenderer();
@@ -62,12 +71,21 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 		touchPosition = new Vector3();
 		Gdx.input.setInputProcessor(new GestureDetector(this));
 
+		log.info("somthing");
+		try {
+			whenGetRequest_thenCorrect();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		try {
 			//in most cases, geolocation won't be in the center of the tile because tile borders are predetermined (geolocation can be at the corner of a tile)
 			ZoomXY centerTile = MapRasterTiles.getTileNumber(CENTER_GEOLOCATION.lat, CENTER_GEOLOCATION.lng, ZOOM);
 			mapTiles = MapRasterTiles.getRasterTileZone(centerTile, NUM_TILES);
 			//you need the beginning tile (tile on the top left corner) to convert geolocation to a location in pixels.
 			beginTile = new ZoomXY(ZOOM, centerTile.x - ((NUM_TILES - 1) / 2), centerTile.y - ((NUM_TILES - 1) / 2));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -199,5 +217,31 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
 		camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f, WIDTH - effectiveViewportWidth / 2f);
 		camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f, HEIGHT - effectiveViewportHeight / 2f);
+	}
+
+	OkHttpClient client = new OkHttpClient();
+	public void whenGetRequest_thenCorrect() throws IOException {
+		Request request = new Request.Builder()
+				.url("http://localhost:3000" + "/restaurants")
+				.build();
+
+		Call call = client.newCall(request);
+		Response response = call.execute();
+
+		if(response.body() != null){
+			String responseRes = response.body().string();
+
+			log.info(responseRes);
+			Gson gson = new Gson();
+
+			Restaurant[] restaurantArray = gson.fromJson(responseRes, Restaurant[].class);
+
+			for(Restaurant res : restaurantArray) {
+				log.info(res.toString());
+			}
+		}else{
+			log.info("null");
+		}
+
 	}
 }
