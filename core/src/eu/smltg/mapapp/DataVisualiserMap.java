@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import java.io.IOException;
 
 import eu.smltg.mapapp.locations.Faculty;
+import eu.smltg.mapapp.locations.Park;
 import eu.smltg.mapapp.locations.Restaurant;
 import eu.smltg.mapapp.utils.Geolocation;
 import eu.smltg.mapapp.utils.MapRasterTiles;
@@ -54,6 +55,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
     private Restaurant[] restaurants;
     private Faculty[] faculties;
+    private Park[] parks;
 
     private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
@@ -79,6 +81,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         try {
             restaurants = Restaurant.getRestaurantsAPI();
             faculties = Faculty.getFacultyAPI();
+            parks = Park.getParkAPI();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -142,12 +145,22 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         for(Faculty fa : faculties) {
             //shapeRenderer.circle(marker.x, marker.y, 10);
             Integer[] shape = fa.shape(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            log.info(shape[0] + " :" + shape[1]);
+            //log.info(shape[0] + " :" + shape[1]);
             shapeRenderer.rect(fa.x, fa.y, shape[0], shape[1]);
+            //shapeRenderer.polygon();
         }
+
+
 		//log.info(marker.x + " :" + marker.y);
 		shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        shapeRenderer.setColor(new Color(1, 0, 0, 0.5f));
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for(Park pa: parks){
+            shapeRenderer.polygon(pa.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
+        }
+        shapeRenderer.end();
 
 	}
 

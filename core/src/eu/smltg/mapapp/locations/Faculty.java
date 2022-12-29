@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+//TODO points markers for faculties and than polygons for the actua buildings
 public class Faculty {
     public String display_name;
     public String[] boundingbox;
