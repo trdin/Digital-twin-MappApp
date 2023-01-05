@@ -1,10 +1,12 @@
 package eu.smltg.mapapp.locations;
 
+import com.badlogic.gdx.utils.Logger;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 
 import eu.smltg.mapapp.Const;
+import eu.smltg.mapapp.DataVisualiserMap;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -16,9 +18,8 @@ public class Restaurant {
     public String _id;
     public String name;
     public String address;
-    public String dataSeries;
-    public Integer __v ;
-    public String smth;
+
+    private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
 
     /*"_id": "6278fb184365cb3b54730bd6",
@@ -44,8 +45,9 @@ public class Restaurant {
 
         if(response.body() != null){
             String responseRes = response.body().string();
-
+            log.info(responseRes);
             Gson gson = new Gson();
+
 
             return gson.fromJson(responseRes, Restaurant[].class);
         }else{

@@ -173,7 +173,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         for (Restaurant res : restaurants) {
-            PixelPosition marker = MapRasterTiles.getPixelPosition(res.location.coordinates[1], res.location.coordinates[0], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+            PixelPosition marker = MapRasterTiles.getPixelPosition(res.location.coordinates[0], res.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
             batch.draw(image, marker.x - image.getWidth() / 2, marker.y);
             //log.info(marker.x + " :" + marker.y);
         }
