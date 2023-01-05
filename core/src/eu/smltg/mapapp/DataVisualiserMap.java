@@ -28,6 +28,7 @@ import java.io.IOException;
 import eu.smltg.mapapp.locations.Faculty;
 import eu.smltg.mapapp.locations.Park;
 import eu.smltg.mapapp.locations.Restaurant;
+import eu.smltg.mapapp.locations.Wifi;
 import eu.smltg.mapapp.utils.Geolocation;
 import eu.smltg.mapapp.utils.MapRasterTiles;
 import eu.smltg.mapapp.utils.PixelPosition;
@@ -56,6 +57,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private Restaurant[] restaurants;
     private Faculty[] faculties;
     private Park[] parks;
+    private Wifi[] wifi;
 
     private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
@@ -82,7 +84,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             restaurants = Restaurant.getRestaurantsAPI();
             faculties = Faculty.getFacultyAPI();
             parks = Park.getParkAPI();
-
+            wifi = Wifi.getWifiAPI();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -169,15 +171,33 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         //PixelPosition marker = MapRasterTiles.getPixelPosition(restaurants[0].location.coordinates[1], restaurants[0].location.coordinates[0], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
         //PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
         Texture image = new Texture(Gdx.files.internal("marker.png"));
+        Texture wifiImage = new Texture(Gdx.files.internal("ic_wifi.png"));
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         for (Restaurant res : restaurants) {
             PixelPosition marker = MapRasterTiles.getPixelPosition(res.location.coordinates[0], res.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(image, marker.x - image.getWidth() / 2, marker.y);
+            batch.draw(image, marker.x - image.getWidth() / 2f, marker.y);
             //log.info(marker.x + " :" + marker.y);
         }
+
+        for(Wifi wifi: wifi) {
+            PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0],wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+            batch.draw(wifiImage, marker.x - 26 , marker.y - 20, 54, 40);
+        }
         batch.end();
+        drawWifiRange();
+
+    }
+
+    private void drawWifiRange() {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1f,1f,1f,1);
+        for(Wifi wifi: wifi) {
+            PixelPosition point = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0],wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+            shapeRenderer.circle(point.x, point.y, 25);
+        }
+        shapeRenderer.end();
 
     }
 

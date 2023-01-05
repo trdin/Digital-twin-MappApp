@@ -12,44 +12,43 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class Restaurant {
+public class Wifi {
 
     public Location location;
     public String _id;
+    public String wifiId;
     public String name;
     public String address;
 
     private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
+    public static Wifi[] getWifiAPI() throws IOException {
 
-    /*"_id": "6278fb184365cb3b54730bd6",
-    "name": "Zlati Lev",
-    "address": "Lo�ka ulica 10, Maribor",
-    "dataSeries": "62753385bc8191993bdd939f",
-    "__v": 0*/
-
-
-    @Override
-    public String toString() {
-        return this.name + " + " + this.location.toString() + "i";
-    }
-
-    public static Restaurant[] getRestaurantsAPI() throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(Const.apiLink + "/restaurants")
+                .url(Const.apiLink+ "/wifi")
                 .build();
 
         Call call = client.newCall(request);
         Response response = call.execute();
 
-        if(response.body() != null){
+        if(response.body() != null) {
             String responseRes = response.body().string();
             log.info(responseRes);
             Gson gson = new Gson();
-            return gson.fromJson(responseRes, Restaurant[].class);
+            return gson.fromJson(responseRes, Wifi[].class);
         }else{
-            return new Restaurant[]{};
+            return new Wifi[]{};
         }
     }
+//    "location": {
+//        "type": "Point",
+//                "coordinates": [46.5594185, 15.6451287]
+//    },
+//            "_id": "63b554779d1d9c72665bef7c",
+//            "name": "University of Maribor ",
+//            "password": "",
+//            "dataSeries": "63b5545d9d1d9c72665bef75",
+//            "wifiId": "81348424",
+//            "__v": 0
 }
