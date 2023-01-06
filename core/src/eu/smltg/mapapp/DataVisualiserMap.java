@@ -3,6 +3,7 @@ package eu.smltg.mapapp;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,8 +21,14 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.io.IOException;
 
@@ -36,9 +43,19 @@ import eu.smltg.mapapp.utils.ZoomXY;
 
 public class DataVisualiserMap extends ApplicationAdapter implements GestureDetector.GestureListener {
 
+    private Texture image;
+    private Texture wifiImage;
+
+    private Viewport viewport;
+    private Stage buttonStage;
+    private Skin skin;
+    private TextButton backButton;
+
     private ShapeRenderer shapeRenderer;
     private Vector3 touchPosition;
     private SpriteBatch batch;
+
+    private AssetManager assetManager;
 
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
@@ -53,6 +70,8 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private final Geolocation MARKER_GEOLOCATION = new Geolocation(46.559070, 15.638100);
     private final int WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
     private final int HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
+    private int SCREEN_WIDHT;
+    private int SCREEN_HEIGHT;
 
     private Restaurant[] restaurants;
     private Faculty[] faculties;
@@ -63,8 +82,26 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
     @Override
     public void create() {
+        SCREEN_WIDHT= Gdx.graphics.getWidth();
+        SCREEN_HEIGHT= Gdx.graphics.getHeight();
+        image = new Texture(Gdx.files.internal("marker.png"));
+        wifiImage = new Texture(Gdx.files.internal("ic_wifi.png"));
+
+        assetManager = new AssetManager();
+        assetManager.load("ui/uiskin.json", Skin.class);
+        assetManager.finishLoading();
+        //assetManager.update();
+
+
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
+
+
+        viewport = new FitViewport(SCREEN_WIDHT, SCREEN_HEIGHT);
+        buttonStage = new Stage(viewport, batch);
+        skin = assetManager.get("ui/uiskin.json", Skin.class);
+        buttonStage.addActor(createBackButton());
+
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, WIDTH, HEIGHT);
@@ -73,6 +110,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         camera.viewportHeight = HEIGHT / 2f;
         camera.zoom = 2f;
         camera.update();
+
 
         batch.setProjectionMatrix(camera.combined);
 
@@ -118,6 +156,19 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
     }
 
+    private Actor createBackButton() {
+        backButton = new TextButton("Back to Menu", skin);
+        backButton.setWidth(100);
+        backButton.setPosition(SCREEN_WIDHT/2f - backButton.getWidth() / 2f, SCREEN_HEIGHT-20-  backButton.getHeight());
+        /*backButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                log.info("something");
+            }
+        });*/
+        return backButton;
+    }
+
     @Override
     public void render() {
         ScreenUtils.clear(0, 0, 0, 1);
@@ -131,20 +182,22 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
         drawMarkers();
         drawShapes();
+
+        buttonStage.draw();
     }
 
     // TODO drawing shapes fro faculty and buildings
-	private void drawShapes() {
-		//PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+    private void drawShapes() {
+        //PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
 
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		shapeRenderer.setColor(new Color(0, 1, 0, 0.5f));
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.setColor(new Color(0, 1, 0, 0.5f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        for(Faculty fa : faculties) {
+        for (Faculty fa : faculties) {
             //shapeRenderer.circle(marker.x, marker.y, 10);
             Integer[] shape = fa.shape(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
             //log.info(shape[0] + " :" + shape[1]);
@@ -153,25 +206,24 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         }
 
 
-		//log.info(marker.x + " :" + marker.y);
-		shapeRenderer.end();
+        //log.info(marker.x + " :" + marker.y);
+        shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
         shapeRenderer.setColor(new Color(1, 0, 0, 0.5f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for(Park pa: parks){
+        for (Park pa : parks) {
             shapeRenderer.polygon(pa.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
         }
         Gdx.gl.glLineWidth(3);
         shapeRenderer.end();
 
-	}
+    }
 
     private void drawMarkers() {
         //PixelPosition marker = MapRasterTiles.getPixelPosition(restaurants[0].location.coordinates[1], restaurants[0].location.coordinates[0], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
         //PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-        Texture image = new Texture(Gdx.files.internal("marker.png"));
-        Texture wifiImage = new Texture(Gdx.files.internal("ic_wifi.png"));
+
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -181,9 +233,9 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             //log.info(marker.x + " :" + marker.y);
         }
 
-        for(Wifi wifi: wifi) {
-            PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0],wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(wifiImage, marker.x - 26 , marker.y - 20, 54, 40);
+        for (Wifi wifi : wifi) {
+            PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+            batch.draw(wifiImage, marker.x - 26, marker.y - 20, 54, 40);
         }
         batch.end();
         drawWifiRange();
@@ -192,9 +244,9 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
     private void drawWifiRange() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1f,1f,1f,1);
-        for(Wifi wifi: wifi) {
-            PixelPosition point = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0],wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+        shapeRenderer.setColor(1f, 1f, 1f, 1);
+        for (Wifi wifi : wifi) {
+            PixelPosition point = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
             shapeRenderer.circle(point.x, point.y, 25);
         }
         shapeRenderer.end();
@@ -211,13 +263,21 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     public boolean touchDown(float x, float y, int pointer, int button) {
         touchPosition.set(x, y, 0);
         camera.unproject(touchPosition);
+        log.info(HEIGHT+"");
+        log.info(WIDTH+ "");
+
+        log.info("toch: " + x + " : " + y);
+        log.info("some");
+        log.info("button: x: " + backButton.getX() + " y: " +(SCREEN_HEIGHT- backButton.getY() )+ " " + backButton.getHeight());
+        if (backButton.getX() <= x && x < backButton.getX() + backButton.getWidth()
+                && (SCREEN_HEIGHT - backButton.getY()) >= y && y >= (SCREEN_HEIGHT - backButton.getY()) - backButton.getHeight()) {
+            log.info("something------");
+        }
         return false;
     }
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-
-        log.info("tap");
         return false;
     }
 
