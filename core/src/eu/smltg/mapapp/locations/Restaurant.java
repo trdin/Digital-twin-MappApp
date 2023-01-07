@@ -37,7 +37,7 @@ public class Restaurant {
     public static Restaurant[] getRestaurantsAPI() throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(Const.apiLink + "/restaurants")
+                .url(Const.apiLink + "restaurants")
                 .build();
 
         Call call = client.newCall(request);

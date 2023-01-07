@@ -25,6 +25,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.io.IOException;
 
+import eu.smltg.mapapp.locations.Bar;
 import eu.smltg.mapapp.locations.Dorm;
 import eu.smltg.mapapp.locations.Faculty;
 import eu.smltg.mapapp.locations.Park;
@@ -60,6 +61,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private Park[] parks;
     private Wifi[] wifi;
     private Dorm[] dorms;
+    private Bar[] bars;
 
     private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
@@ -88,6 +90,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             parks = Park.getParkAPI();
             wifi = Wifi.getWifiAPI();
             dorms = Dorm.getDormAPI();
+            bars = Bar.getBarsAPI();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -155,7 +158,6 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             //shapeRenderer.polygon();
         }
 
-
 		//log.info(marker.x + " :" + marker.y);
 		shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -185,12 +187,18 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         Texture markerIcon = new Texture(Gdx.files.internal("ic_marker.png"));
         Texture restaurantIcon = new Texture(Gdx.files.internal("ic_restaurant.jpg"));
         Texture wifiIcon = new Texture(Gdx.files.internal("ic_wifi.png"));
+        Texture barIcon = new Texture(Gdx.files.internal("ic_bar.png"));
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         for (Restaurant res : restaurants) {
             PixelPosition marker = MapRasterTiles.getPixelPosition(res.location.coordinates[0], res.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
             batch.draw(restaurantIcon, marker.x - 24, marker.y, 48, 48);
+        }
+
+        for(Bar bar: bars) {
+            PixelPosition marker = MapRasterTiles.getPixelPosition(bar.location.coordinates[0], bar.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+            batch.draw(barIcon, marker.x - 40, marker.y, 48, 48);
         }
 
         for(Wifi wifi: wifi) {

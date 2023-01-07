@@ -42,7 +42,7 @@ public class Park {
     public static Park[] getParkAPI() throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(Const.nominatimApiLink + "/search?q=[leisure=park]&format=json&bounded=true&viewbox=15.60041,46.56974,15.70186,46.53704&limit=100&polygon_geojson=1")
+                .url(Const.nominatimApiLink + "search?q=[leisure=park]&format=json&bounded=true&viewbox=15.60041,46.56974,15.70186,46.53704&limit=100&polygon_geojson=1")
                 .build();
 
         Call call = client.newCall(request);
