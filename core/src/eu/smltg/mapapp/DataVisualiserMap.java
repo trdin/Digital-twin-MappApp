@@ -38,6 +38,10 @@ import eu.smltg.mapapp.utils.ZoomXY;
 
 public class DataVisualiserMap extends ApplicationAdapter implements GestureDetector.GestureListener {
 
+    Texture restaurantIcon;
+    Texture wifiIcon;
+    Texture barIcon;
+
     private ShapeRenderer shapeRenderer;
     private Vector3 touchPosition;
     private SpriteBatch batch;
@@ -82,6 +86,10 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
         touchPosition = new Vector3();
         Gdx.input.setInputProcessor(new GestureDetector(this));
+
+        barIcon = new Texture(Gdx.files.internal("ic_bar.png"));
+        wifiIcon = new Texture(Gdx.files.internal("ic_wifi.png"));
+        restaurantIcon = new Texture(Gdx.files.internal("ic_restaurant.jpg"));
 
         log.info("somthing");
         try {
@@ -184,10 +192,8 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private void drawMarkers() {
         //PixelPosition marker = MapRasterTiles.getPixelPosition(restaurants[0].location.coordinates[1], restaurants[0].location.coordinates[0], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
         //PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-        Texture markerIcon = new Texture(Gdx.files.internal("ic_marker.png"));
-        Texture restaurantIcon = new Texture(Gdx.files.internal("ic_restaurant.jpg"));
-        Texture wifiIcon = new Texture(Gdx.files.internal("ic_wifi.png"));
-        Texture barIcon = new Texture(Gdx.files.internal("ic_bar.png"));
+       //Texture markerIcon = new Texture(Gdx.files.internal("ic_marker.png"));
+
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
