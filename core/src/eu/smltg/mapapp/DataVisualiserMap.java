@@ -148,17 +148,17 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     }
 
     // TODO drawing shapes for faculty and buildings
-	private void drawShapes() {
-		//PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+    private void drawShapes() {
+        //PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
 
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		shapeRenderer.setColor(new Color(0, 1, 0, 0.5f));
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.setColor(new Color(0, 1, 0, 0.5f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        for(Faculty fa : faculties) {
+        for (Faculty fa : faculties) {
             //shapeRenderer.circle(marker.x, marker.y, 10);
             Integer[] shape = fa.shape(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
             //log.info(shape[0] + " :" + shape[1]);
@@ -166,33 +166,33 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             //shapeRenderer.polygon();
         }
 
-		//log.info(marker.x + " :" + marker.y);
-		shapeRenderer.end();
+        //log.info(marker.x + " :" + marker.y);
+        shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
         shapeRenderer.setColor(new Color(1, 0, 0, 0.5f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for(Park pa: parks){
+        for (Park pa : parks) {
             shapeRenderer.polygon(pa.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
         }
         Gdx.gl.glLineWidth(3);
         shapeRenderer.end();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
-        shapeRenderer.setColor(new Color(0,0,1,0.5f));
+        shapeRenderer.setColor(new Color(0, 0, 1, 0.5f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for(Dorm dorm: dorms) {
+        for (Dorm dorm : dorms) {
             shapeRenderer.polygon(dorm.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
         }
         Gdx.gl.glLineWidth(3);
         shapeRenderer.end();
 
-	}
+    }
 
     private void drawMarkers() {
         //PixelPosition marker = MapRasterTiles.getPixelPosition(restaurants[0].location.coordinates[1], restaurants[0].location.coordinates[0], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
         //PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-       //Texture markerIcon = new Texture(Gdx.files.internal("ic_marker.png"));
+        //Texture markerIcon = new Texture(Gdx.files.internal("ic_marker.png"));
 
 
         batch.setProjectionMatrix(camera.combined);
@@ -202,14 +202,14 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             batch.draw(restaurantIcon, marker.x - 24, marker.y, 48, 48);
         }
 
-        for(Bar bar: bars) {
+        for (Bar bar : bars) {
             PixelPosition marker = MapRasterTiles.getPixelPosition(bar.location.coordinates[0], bar.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
             batch.draw(barIcon, marker.x - 40, marker.y, 48, 48);
         }
 
-        for(Wifi wifi: wifi) {
-            PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0],wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(wifiIcon, marker.x - 27 , marker.y - 20, 54, 40);
+        for (Wifi wifi : wifi) {
+            PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+            batch.draw(wifiIcon, marker.x - 27, marker.y - 20, 54, 40);
         }
         batch.end();
         drawWifiRange();
@@ -217,9 +217,9 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
     private void drawWifiRange() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1f,1f,1f,1);
-        for(Wifi wifi: wifi) {
-            PixelPosition point = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0],wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+        shapeRenderer.setColor(1f, 1f, 1f, 1);
+        for (Wifi wifi : wifi) {
+            PixelPosition point = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
             shapeRenderer.circle(point.x, point.y, 25);
         }
         shapeRenderer.end();
@@ -241,8 +241,17 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-
-        log.info("tap");
+        log.info("---------------------------------------");
+        log.info("---------------------------------------");
+//        double lng = MapRasterTiles.getGeolocation(x, y, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+//        log.info("tap x:" + x + ", y: " + y + ", lng: " + lng);
+//        log.info("");
+//        log.info("");
+        Vector3 tmp_unproject = camera.unproject(new Vector3(x, y, 0));
+        double lng_unproject = MapRasterTiles.getGeolocation((int) tmp_unproject.x, (int) tmp_unproject.y, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+        log.info("unproject x:" + (int) tmp_unproject.x + ", y: " + (int) tmp_unproject.y + ", lng: " + lng_unproject);
+        log.info("---------------------------------------");
+        log.info("---------------------------------------");
         return false;
     }
 

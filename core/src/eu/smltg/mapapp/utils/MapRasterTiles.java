@@ -2,11 +2,15 @@ package eu.smltg.mapapp.utils;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import eu.smltg.mapapp.DataVisualiserMap;
+import jdk.internal.org.jline.utils.Log;
 
 public class MapRasterTiles {
     //Mapbox
@@ -22,6 +26,8 @@ public class MapRasterTiles {
     static String token = "?&apiKey=" + "fc77cf324623473e8e26c6190fe19f69";
     static String tilesetId = "klokantech-basic";
     static String format = "@2x.png";
+
+    private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
     //@2x in format means it returns higher DPI version of the image and the image size is 512px (otherwise it is 256px)
     final static public int TILE_SIZE = 512;
@@ -186,14 +192,35 @@ public class MapRasterTiles {
      * @return
      */
     public static PixelPosition getPixelPosition(double lat, double lng, int tileSize, int zoom, int beginTileX, int beginTileY, int height) {
+//        log.info("lng: " + lng);
         double[] worldCoordinate = project(lat, lng, tileSize);
+//        log.info("wc0: " + worldCoordinate[0]);
+//        log.info("wc1: " + worldCoordinate[1]);
         // Scale to fit our image
         double scale = Math.pow(2, zoom);
-
+//        log.info(worldCoordinate[0] * scale + " - " + (beginTileX * tileSize));
+//        log.info("PPx1: " +  (Math.floor(worldCoordinate[0] * scale)));
+//        log.info("PPx2: " +  (worldCoordinate[0] * scale));
+//        log.info("PPx: " +  (Math.floor(worldCoordinate[0] * scale) - (beginTileX * tileSize)));
         // Apply scale to world coordinates to get image coordinates
         return new PixelPosition(
                 (int) (Math.floor(worldCoordinate[0] * scale) - (beginTileX * tileSize)),
                 height - (int) (Math.floor(worldCoordinate[1] * scale) - (beginTileY * tileSize) - 1)
         );
+    }
+
+    public static Double getGeolocation(float x, float y, int tileSize, int zoom, int beginTileX, int beginTileY, int height) {
+        double scale = Math.pow(2, zoom);
+//        double var1 = (beginTileX * tileSize);
+//        log.info("var1: " + var1);
+//        double var2 = x + var1;
+//        log.info("var2: " + var2);
+//        double var3 = var2 / scale;
+//        log.info("var3: " + var3);
+//        double var4 = var3 * 360;
+//        log.info("var4: " + var4);
+//        log.info("var5: " + (var4 - 0.5));
+//        log.info("pr1: " + (((x / scale) * 360) - 0.5));
+        return (((x + (beginTileX * tileSize)) / scale) * 360) - 0.5;
     }
 }
