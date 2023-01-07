@@ -25,6 +25,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.io.IOException;
 
+import eu.smltg.mapapp.locations.Dorm;
 import eu.smltg.mapapp.locations.Faculty;
 import eu.smltg.mapapp.locations.Park;
 import eu.smltg.mapapp.locations.Restaurant;
@@ -58,6 +59,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private Faculty[] faculties;
     private Park[] parks;
     private Wifi[] wifi;
+    private Dorm[] dorms;
 
     private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
@@ -85,6 +87,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             faculties = Faculty.getFacultyAPI();
             parks = Park.getParkAPI();
             wifi = Wifi.getWifiAPI();
+            dorms = Dorm.getDormAPI();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -133,7 +136,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         drawShapes();
     }
 
-    // TODO drawing shapes fro faculty and buildings
+    // TODO drawing shapes for faculty and buildings
 	private void drawShapes() {
 		//PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
 
@@ -161,6 +164,15 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for(Park pa: parks){
             shapeRenderer.polygon(pa.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
+        }
+        Gdx.gl.glLineWidth(3);
+        shapeRenderer.end();
+
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+        shapeRenderer.setColor(new Color(0,0,1,0.5f));
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for(Dorm dorm: dorms) {
+            shapeRenderer.polygon(dorm.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
         }
         Gdx.gl.glLineWidth(3);
         shapeRenderer.end();

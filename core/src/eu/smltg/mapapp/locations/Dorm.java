@@ -12,25 +12,22 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class Park {
+public class Dorm {
 
-    public String display_name;
-    public String[] boundingbox;
-    //center
+    public String place_id;
     public String lat;
     public String lon;
-
+    public String display_name;
+    public int place_rank;
     public GeoJson geojson;
 
-
-    public float[] getPolygon(int tileSize, int zoom, int beginTileX, int beginTileY, int height) {
+    public float[] getPolygon(int tileSize, int zoom, int beginTileX, int beginTileY, int height){
         float[] polygon = new float[geojson.coordinates[0].length * 2];
-
 
         int i = 0;
 
-        for (float[] go : geojson.coordinates[0]) {
-            PixelPosition point = MapRasterTiles.getPixelPosition(go[1], go[0],  tileSize,zoom, beginTileX,beginTileY,height);
+        for(float[] geojson: geojson.coordinates[0]) {
+            PixelPosition point = MapRasterTiles.getPixelPosition(geojson[1], geojson[0], tileSize, zoom, beginTileX, beginTileY, height);
             polygon[i] = point.x;
             i++;
             polygon[i] = point.y;
@@ -39,23 +36,22 @@ public class Park {
         return polygon;
     }
 
-    public static Park[] getParkAPI() throws IOException {
+    public static Dorm[] getDormAPI() throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(Const.nominatimApiLink + "/search?q=[leisure=park]&format=json&bounded=true&viewbox=15.60041,46.56974,15.70186,46.53704&limit=100&polygon_geojson=1")
+                .url(Const.nominatimApiLink + "search.php?q=študentski+dom+Maribor&format=jsonv2&polygon_geojson=1")
                 .build();
 
         Call call = client.newCall(request);
         Response response = call.execute();
 
-        if (response.body() != null) {
-            String responseRes = response.body().string();
-
+        if(response.body() != null) {
+            String responseString = response.body().string();
             Gson gson = new Gson();
 
-            return gson.fromJson(responseRes, Park[].class);
-        } else {
-            return new Park[]{};
+            return gson.fromJson(responseString, Dorm[].class);
+        }else {
+            return new Dorm[]{};
         }
     }
 }
