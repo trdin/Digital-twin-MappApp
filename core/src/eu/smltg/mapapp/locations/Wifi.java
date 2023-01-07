@@ -26,7 +26,7 @@ public class Wifi {
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(Const.apiLink+ "/wifi")
+                .url(Const.apiLink+ "wifi")
                 .build();
 
         Call call = client.newCall(request);

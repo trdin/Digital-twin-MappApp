@@ -28,7 +28,7 @@ public class Faculty {
     public static Faculty[] getFacultyAPI() throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url(Const.nominatimApiLink + "/search?q=[amenity=university]&format=json&bounded=true&viewbox=15.60041,46.56974,15.70186,46.53704&limit=100")
+                .url(Const.nominatimApiLink + "search?q=[amenity=university]&format=json&bounded=true&viewbox=15.60041,46.56974,15.70186,46.53704&limit=100")
                 .build();
 
         Call call = client.newCall(request);
