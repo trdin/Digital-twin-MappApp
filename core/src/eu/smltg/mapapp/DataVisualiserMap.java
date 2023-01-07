@@ -182,24 +182,23 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private void drawMarkers() {
         //PixelPosition marker = MapRasterTiles.getPixelPosition(restaurants[0].location.coordinates[1], restaurants[0].location.coordinates[0], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
         //PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-        Texture image = new Texture(Gdx.files.internal("marker.png"));
-        Texture wifiImage = new Texture(Gdx.files.internal("ic_wifi.png"));
+        Texture markerIcon = new Texture(Gdx.files.internal("ic_marker.png"));
+        Texture restaurantIcon = new Texture(Gdx.files.internal("ic_restaurant.jpg"));
+        Texture wifiIcon = new Texture(Gdx.files.internal("ic_wifi.png"));
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         for (Restaurant res : restaurants) {
             PixelPosition marker = MapRasterTiles.getPixelPosition(res.location.coordinates[0], res.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(image, marker.x - image.getWidth() / 2f, marker.y);
-            //log.info(marker.x + " :" + marker.y);
+            batch.draw(restaurantIcon, marker.x - 24, marker.y, 48, 48);
         }
 
         for(Wifi wifi: wifi) {
             PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0],wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(wifiImage, marker.x - 26 , marker.y - 20, 54, 40);
+            batch.draw(wifiIcon, marker.x - 27 , marker.y - 20, 54, 40);
         }
         batch.end();
         drawWifiRange();
-
     }
 
     private void drawWifiRange() {
