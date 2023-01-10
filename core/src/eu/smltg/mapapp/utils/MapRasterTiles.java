@@ -91,7 +91,6 @@ public class MapRasterTiles {
 
         for (int i = 0; i < size * size; i++) {
             array[i] = getRasterTile(zoomXY.zoom, zoomXY.x + factorX[i], zoomXY.y + factorY[i]);
-            System.out.println(zoomXY.zoom + "/" + (zoomXY.x + factorX[i]) + "/" + (zoomXY.y + factorY[i]));
         }
         return array;
     }

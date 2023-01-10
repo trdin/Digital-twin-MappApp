@@ -14,6 +14,8 @@ import okhttp3.Response;
 
 //TODO points markers for faculties and than polygons for the actua buildings
 public class Faculty {
+    public static boolean locationFilter = true;
+
     public String display_name;
     public String[] boundingbox;
     //center
