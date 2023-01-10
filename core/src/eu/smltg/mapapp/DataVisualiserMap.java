@@ -37,6 +37,7 @@ import eu.smltg.mapapp.locations.Bar;
 import eu.smltg.mapapp.locations.Dorm;
 import eu.smltg.mapapp.locations.Faculty;
 import eu.smltg.mapapp.locations.FacultyType;
+import eu.smltg.mapapp.locations.Location;
 import eu.smltg.mapapp.locations.Park;
 import eu.smltg.mapapp.locations.Restaurant;
 import eu.smltg.mapapp.locations.Wifi;
@@ -77,8 +78,8 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private final Geolocation MARKER_GEOLOCATION = new Geolocation(46.559070, 15.638100);
     private final int WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
     private final int HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
-    private int SCREEN_WIDHT;
-    private int SCREEN_HEIGHT;
+    public static int SCREEN_WIDHT;
+    public static int SCREEN_HEIGHT;
 
     private Restaurant[] restaurants;
     private Faculty[] faculties;
@@ -122,6 +123,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         inputMultiplexer.addProcessor(new GestureDetector(this));
 
         stage.addActor(Buttons.createUi(skin));
+        stage.addActor(Text.createUi(skin));
         inputMultiplexer.addProcessor(stage);
 
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -291,8 +293,9 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-
-        log.info("tap");
+        Vector3 tmp_unproject = camera.unproject(new Vector3(x, y, 0));
+        Location tap_geolocation = MapRasterTiles.getGeolocation((int) tmp_unproject.x, (int) tmp_unproject.y, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+        Text.updateGeolocation(tap_geolocation);
         return false;
     }
 
