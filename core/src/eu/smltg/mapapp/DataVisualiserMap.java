@@ -78,8 +78,8 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private final Geolocation MARKER_GEOLOCATION = new Geolocation(46.559070, 15.638100);
     private final int WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
     private final int HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
-    private int SCREEN_WIDHT;
-    private int SCREEN_HEIGHT;
+    public static int SCREEN_WIDHT;
+    public static int SCREEN_HEIGHT;
 
     private Restaurant[] restaurants;
     private Faculty[] faculties;
@@ -123,6 +123,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         inputMultiplexer.addProcessor(new GestureDetector(this));
 
         stage.addActor(Buttons.createUi(skin));
+        stage.addActor(Text.createUi(skin));
         inputMultiplexer.addProcessor(stage);
 
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -294,8 +295,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     public boolean tap(float x, float y, int count, int button) {
         Vector3 tmp_unproject = camera.unproject(new Vector3(x, y, 0));
         Location tap_geolocation = MapRasterTiles.getGeolocation((int) tmp_unproject.x, (int) tmp_unproject.y, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-        log.info("x:" + (int) tmp_unproject.x + ", y: " + (int) tmp_unproject.y +
-                "\nlat: " + tap_geolocation.getLat() + ", lon: " + tap_geolocation.getLon());
+        Text.updateGeolocation(tap_geolocation);
         return false;
     }
 
