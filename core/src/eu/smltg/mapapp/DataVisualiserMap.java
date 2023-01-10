@@ -3,6 +3,9 @@ package eu.smltg.mapapp;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,18 +23,25 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
 import eu.smltg.mapapp.locations.Bar;
 import eu.smltg.mapapp.locations.Dorm;
 import eu.smltg.mapapp.locations.Faculty;
+import eu.smltg.mapapp.locations.FacultyType;
 import eu.smltg.mapapp.locations.Location;
 import eu.smltg.mapapp.locations.Park;
 import eu.smltg.mapapp.locations.Restaurant;
 import eu.smltg.mapapp.locations.Wifi;
+import eu.smltg.mapapp.utils.Assets;
 import eu.smltg.mapapp.utils.Geolocation;
 import eu.smltg.mapapp.utils.MapRasterTiles;
 import eu.smltg.mapapp.utils.PixelPosition;
@@ -39,9 +49,17 @@ import eu.smltg.mapapp.utils.ZoomXY;
 
 public class DataVisualiserMap extends ApplicationAdapter implements GestureDetector.GestureListener {
 
+
+    private Viewport viewport;
+    private Stage stage;
+    private Skin skin;
+
     Texture restaurantIcon;
     Texture wifiIcon;
     Texture barIcon;
+    Texture facultyIcon;
+
+    private AssetManager assetManager;
 
     private ShapeRenderer shapeRenderer;
     private Vector3 touchPosition;
@@ -60,6 +78,8 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private final Geolocation MARKER_GEOLOCATION = new Geolocation(46.559070, 15.638100);
     private final int WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
     private final int HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
+    private int SCREEN_WIDHT;
+    private int SCREEN_HEIGHT;
 
     private Restaurant[] restaurants;
     private Faculty[] faculties;
@@ -72,8 +92,20 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
     @Override
     public void create() {
+        SCREEN_WIDHT = Gdx.graphics.getWidth();
+        SCREEN_HEIGHT = Gdx.graphics.getHeight();
+
+        assetManager = new AssetManager();
+        assetManager.load(Assets.Descriptors.UI);
+        assetManager.finishLoading();
+
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
+
+        viewport = new FitViewport(SCREEN_WIDHT, SCREEN_HEIGHT);
+        stage = new Stage(viewport, batch);
+
+        skin = assetManager.get(Assets.Descriptors.UI);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, WIDTH, HEIGHT);
@@ -85,14 +117,21 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
         batch.setProjectionMatrix(camera.combined);
 
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+
         touchPosition = new Vector3();
-        Gdx.input.setInputProcessor(new GestureDetector(this));
+        inputMultiplexer.addProcessor(new GestureDetector(this));
 
-        barIcon = new Texture(Gdx.files.internal("ic_bar.png"));
-        wifiIcon = new Texture(Gdx.files.internal("ic_wifi.png"));
-        restaurantIcon = new Texture(Gdx.files.internal("ic_restaurant.jpg"));
+        stage.addActor(Buttons.createUi(skin));
+        inputMultiplexer.addProcessor(stage);
 
-        log.info("somthing");
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
+        barIcon = new Texture(Gdx.files.internal("java.png"));
+        wifiIcon = new Texture(Gdx.files.internal("wifi.png"));
+        restaurantIcon = new Texture(Gdx.files.internal("restaurant.png"));
+        facultyIcon = new Texture(Gdx.files.internal("faculty.png"));
+
         try {
             restaurants = Restaurant.getRestaurantsAPI();
             faculties = Faculty.getFacultyAPI();
@@ -131,6 +170,8 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         layers.add(layer);
 
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+
+
     }
 
     @Override
@@ -146,45 +187,43 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
         drawMarkers();
         drawShapes();
+
+        stage.draw();
     }
 
     // TODO drawing shapes for faculty and buildings
     private void drawShapes() {
+        shapeRenderer.setProjectionMatrix(camera.combined);
         //PixelPosition marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
 
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
         //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.setProjectionMatrix(camera.combined);
+//        shapeRenderer.setColor(new Color(0, 1, 0, 0.5f));
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(new Color(0, 1, 0, 0.5f));
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        for (Faculty fa : faculties) {
-            //shapeRenderer.circle(marker.x, marker.y, 10);
-            Integer[] shape = fa.shape(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            //log.info(shape[0] + " :" + shape[1]);
-            shapeRenderer.rect(fa.x, fa.y, shape[0], shape[1]);
-            //shapeRenderer.polygon();
-        }
-
-        //log.info(marker.x + " :" + marker.y);
+        if (Faculty.locationFilter)
+            for (Faculty fa : faculties) {
+                if (fa.facultyType == FacultyType.POLYGON)
+                    shapeRenderer.polygon(fa.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
+            }
         shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         shapeRenderer.setColor(new Color(1, 0, 0, 0.5f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Park pa : parks) {
-            shapeRenderer.polygon(pa.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
-        }
+        if (Park.locationFilter)
+            for (Park pa : parks) {
+                shapeRenderer.polygon(pa.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
+            }
         Gdx.gl.glLineWidth(3);
         shapeRenderer.end();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
         shapeRenderer.setColor(new Color(0, 0, 1, 0.5f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Dorm dorm : dorms) {
-            shapeRenderer.polygon(dorm.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
-        }
+        if (Dorm.locationFilter)
+            for (Dorm dorm : dorms) {
+                shapeRenderer.polygon(dorm.getPolygon(MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT));
+            }
         Gdx.gl.glLineWidth(3);
         shapeRenderer.end();
 
@@ -198,22 +237,34 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        for (Restaurant res : restaurants) {
-            PixelPosition marker = MapRasterTiles.getPixelPosition(res.location.coordinates[0], res.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(restaurantIcon, marker.x - 24, marker.y, 48, 48);
-        }
+        if (Restaurant.locationFilter)
+            for (Restaurant res : restaurants) {
+                PixelPosition marker = MapRasterTiles.getPixelPosition(res.location.coordinates[0], res.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+                batch.draw(restaurantIcon, marker.x - 48, marker.y, 48, 48);
+            }
 
-        for (Bar bar : bars) {
-            PixelPosition marker = MapRasterTiles.getPixelPosition(bar.location.coordinates[0], bar.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(barIcon, marker.x - 40, marker.y, 48, 48);
-        }
+        if (Bar.locationFilter)
+            for (Bar bar : bars) {
+                PixelPosition marker = MapRasterTiles.getPixelPosition(bar.location.coordinates[0], bar.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+                batch.draw(barIcon, marker.x - 40, marker.y, 48, 48);
+            }
 
-        for (Wifi wifi : wifi) {
-            PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(wifiIcon, marker.x - 27, marker.y - 20, 54, 40);
-        }
+        if (Faculty.locationFilter)
+            for (Faculty faculty : faculties) {
+//                if (faculty.facultyType == FacultyType.POINT) {
+                    PixelPosition marker = MapRasterTiles.getPixelPosition(faculty.lat, faculty.lon, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+                    batch.draw(facultyIcon, marker.x - 40, marker.y, 48, 48);
+//                }
+            }
+
+        if (Wifi.locationFilter)
+            for (Wifi wifi : wifi) {
+                PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+                batch.draw(wifiIcon, marker.x - 24, marker.y - 24, 48, 48);
+            }
         batch.end();
-        drawWifiRange();
+        if (Wifi.locationFilter)
+            drawWifiRange();
     }
 
     private void drawWifiRange() {
@@ -224,7 +275,6 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             shapeRenderer.circle(point.x, point.y, 25);
         }
         shapeRenderer.end();
-
     }
 
     @Override
@@ -317,30 +367,4 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f, WIDTH - effectiveViewportWidth / 2f);
         camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f, HEIGHT - effectiveViewportHeight / 2f);
     }
-
-	/*OkHttpClient client = new OkHttpClient();
-	public void whenGetRequest_thenCorrect() throws IOException {
-		Request request = new Request.Builder()
-				.url(Const.apiLink + "/restaurants")
-				.build();
-
-		Call call = client.newCall(request);
-		Response response = call.execute();
-
-		if(response.body() != null){
-			String responseRes = response.body().string();
-
-			log.info(responseRes);
-			Gson gson = new Gson();
-
-			Restaurant[] restaurantArray = gson.fromJson(responseRes, Restaurant[].class);
-
-			for(Restaurant res : restaurantArray) {
-				log.info(res.toString());
-			}
-		}else{
-			log.info("null");
-		}
-
-	}*/
 }

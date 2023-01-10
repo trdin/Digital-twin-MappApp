@@ -11,6 +11,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class Bar {
+    public static boolean locationFilter = true;
 
     public String place_id;
     public String name;

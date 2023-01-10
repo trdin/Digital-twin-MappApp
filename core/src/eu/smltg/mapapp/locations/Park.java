@@ -13,6 +13,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class Park {
+    public static boolean locationFilter = true;
 
     public String display_name;
     public String[] boundingbox;

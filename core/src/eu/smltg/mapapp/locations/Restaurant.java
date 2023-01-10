@@ -13,6 +13,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class Restaurant {
+    public static boolean locationFilter = true;
 
     public Location location;
     public String _id;
@@ -45,7 +46,6 @@ public class Restaurant {
 
         if(response.body() != null){
             String responseRes = response.body().string();
-            log.info(responseRes);
             Gson gson = new Gson();
             return gson.fromJson(responseRes, Restaurant[].class);
         }else{

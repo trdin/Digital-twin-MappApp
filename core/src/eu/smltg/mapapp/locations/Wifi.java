@@ -13,6 +13,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class Wifi {
+    public static boolean locationFilter = true;
 
     public Location location;
     public String _id;
@@ -34,7 +35,6 @@ public class Wifi {
 
         if(response.body() != null) {
             String responseRes = response.body().string();
-            log.info(responseRes);
             Gson gson = new Gson();
             return gson.fromJson(responseRes, Wifi[].class);
         }else{
