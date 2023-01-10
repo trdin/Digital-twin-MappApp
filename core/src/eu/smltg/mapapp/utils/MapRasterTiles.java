@@ -2,6 +2,7 @@ package eu.smltg.mapapp.utils;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 
 import java.io.ByteArrayOutputStream;
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import eu.smltg.mapapp.DataVisualiserMap;
+import eu.smltg.mapapp.locations.Location;
 import jdk.internal.org.jline.utils.Log;
 
 public class MapRasterTiles {
@@ -209,18 +211,13 @@ public class MapRasterTiles {
         );
     }
 
-    public static Double getGeolocation(float x, float y, int tileSize, int zoom, int beginTileX, int beginTileY, int height) {
+    public static Location getGeolocation(float x, float y, int tileSize, int zoom, int beginTileX, int beginTileY, int height) {
         double scale = Math.pow(2, zoom);
-//        double var1 = (beginTileX * tileSize);
-//        log.info("var1: " + var1);
-//        double var2 = x + var1;
-//        log.info("var2: " + var2);
-//        double var3 = var2 / scale;
-//        log.info("var3: " + var3);
-//        double var4 = var3 * 360;
-//        log.info("var4: " + var4);
-//        log.info("var5: " + (var4 - 0.5));
-//        log.info("pr1: " + (((x / scale) * 360) - 0.5));
-        return (((x + (beginTileX * tileSize)) / scale) * 360) - 0.5;
+        double nuk = Math.ceil(-y + (beginTileY * tileSize) + 1) / scale;
+        double oo = (0.5 - (nuk / tileSize)) * (4 * Math.PI);
+        double r = (Math.exp(oo) - 1) / (1 + Math.exp(oo));
+        final double lat = ((Math.asin(r) * 180) / Math.PI) - 0.022;
+        final double lon = ((((x + (beginTileX * tileSize)) / scale) / tileSize) - 0.5) * 360;
+        return new Location(lat, lon);
     }
 }

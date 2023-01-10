@@ -28,6 +28,7 @@ import java.io.IOException;
 import eu.smltg.mapapp.locations.Bar;
 import eu.smltg.mapapp.locations.Dorm;
 import eu.smltg.mapapp.locations.Faculty;
+import eu.smltg.mapapp.locations.Location;
 import eu.smltg.mapapp.locations.Park;
 import eu.smltg.mapapp.locations.Restaurant;
 import eu.smltg.mapapp.locations.Wifi;
@@ -241,17 +242,10 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
     @Override
     public boolean tap(float x, float y, int count, int button) {
-        log.info("---------------------------------------");
-        log.info("---------------------------------------");
-//        double lng = MapRasterTiles.getGeolocation(x, y, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-//        log.info("tap x:" + x + ", y: " + y + ", lng: " + lng);
-//        log.info("");
-//        log.info("");
         Vector3 tmp_unproject = camera.unproject(new Vector3(x, y, 0));
-        double lng_unproject = MapRasterTiles.getGeolocation((int) tmp_unproject.x, (int) tmp_unproject.y, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-        log.info("unproject x:" + (int) tmp_unproject.x + ", y: " + (int) tmp_unproject.y + ", lng: " + lng_unproject);
-        log.info("---------------------------------------");
-        log.info("---------------------------------------");
+        Location tap_geolocation = MapRasterTiles.getGeolocation((int) tmp_unproject.x, (int) tmp_unproject.y, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+        log.info("x:" + (int) tmp_unproject.x + ", y: " + (int) tmp_unproject.y +
+                "\nlat: " + tap_geolocation.getLat() + ", lon: " + tap_geolocation.getLon());
         return false;
     }
 
