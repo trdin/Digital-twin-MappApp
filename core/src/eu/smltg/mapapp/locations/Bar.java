@@ -1,10 +1,12 @@
 package eu.smltg.mapapp.locations;
 
+import com.badlogic.gdx.math.Vector2;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 
 import eu.smltg.mapapp.Const;
+import eu.smltg.mapapp.utils.PixelPosition;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -17,6 +19,8 @@ public class Bar {
     public String name;
     public String address;
     public Location location;
+
+    public PixelPosition pixelPos;
 
 
     public static Bar[] getBarsAPI() throws IOException {

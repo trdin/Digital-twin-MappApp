@@ -12,6 +12,7 @@ public class Text {
     private static final int PX_PER_CHAR = 27;
     static TextField latField;
     static TextField lonField;
+    static TextField displayNameField;
 
     public static Actor createUi(Skin skin) {
         Table table = new Table();
@@ -25,22 +26,35 @@ public class Text {
         lonField.setDisabled(true);
         lonField.setAlignment(Align.center);
 
+        displayNameField = new TextField("Click on an icon", skin);
+        displayNameField.setDisabled(true);
+        displayNameField.setAlignment(Align.center);
+
+
+        Table geoTable = new Table();
+        geoTable.defaults().width(80).pad(5);
+
+        geoTable.add(latField).width(DataVisualiserMap.SCREEN_WIDHT * .25f);
+        geoTable.row();
+        geoTable.add(lonField).width(DataVisualiserMap.SCREEN_WIDHT * .25f);
+
+        geoTable.left().top();
+        geoTable.setTransform(true);
+        geoTable.setScale(.7f);
+        geoTable.setOrigin(0, geoTable.getPrefHeight());
 
         Table textTable = new Table();
-        textTable.defaults().width(80).pad(5);
-
-        textTable.add(latField).width(DataVisualiserMap.SCREEN_WIDHT * .25f);
-        textTable.row();
-        textTable.add(lonField).width(DataVisualiserMap.SCREEN_WIDHT * .25f);
-
-        textTable.left().top();
         textTable.setTransform(true);
-        textTable.setScale(.7f);
-        textTable.setOrigin(0, textTable.getPrefHeight());
+        textTable.defaults().width(80).pad(0);
+        textTable.setOrigin(textTable.getPrefWidth(), textTable.getPrefHeight());
 
+        textTable.right().top();
+
+        textTable.add(displayNameField).width(DataVisualiserMap.SCREEN_WIDHT * .70f).fillY().fillX();
 
         table.left().top();
-        table.add(textTable);
+        table.add(geoTable).fillY().fillX();
+        table.add(textTable).fillY().fillX();
         table.setFillParent(true);
         table.pack();
 
@@ -50,6 +64,12 @@ public class Text {
     public static void updateGeolocation(Location location) {
         latField.setText(String.valueOf(location.getLat()).substring(0,9));
         lonField.setText(String.valueOf(location.getLon()).substring(0,9));
+    }
+    public static void updateDisplayName(String str) {
+        displayNameField.setText(str);
+    }
+    public static void resetDisplayName() {
+        displayNameField.setText("Click on an icon");
     }
 
 }
