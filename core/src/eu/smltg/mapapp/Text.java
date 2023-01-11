@@ -66,7 +66,7 @@ public class Text {
         lonField.setText(String.valueOf(location.getLon()).substring(0,9));
     }
     public static void updateDisplayName(String str) {
-        displayNameField.setText(str);
+        displayNameField.setText(str.replace("š", "s").replace("č", "c").replace("ž", "z"));
     }
     public static void resetDisplayName() {
         displayNameField.setText("Click on an icon");
