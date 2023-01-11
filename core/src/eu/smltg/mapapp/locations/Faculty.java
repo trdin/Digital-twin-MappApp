@@ -33,6 +33,8 @@ public class Faculty {
 
     public GeoJson geojson;
 
+    public PixelPosition pixelPos;
+
     public Faculty(String display_name, double lat, double lon) {
         this.display_name = display_name;
         this.lat = lat;

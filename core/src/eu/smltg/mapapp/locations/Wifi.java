@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import eu.smltg.mapapp.Const;
 import eu.smltg.mapapp.DataVisualiserMap;
+import eu.smltg.mapapp.utils.PixelPosition;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -20,6 +21,8 @@ public class Wifi {
     public String wifiId;
     public String name;
     public String address;
+
+    public PixelPosition pixelPos;
 
     private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 

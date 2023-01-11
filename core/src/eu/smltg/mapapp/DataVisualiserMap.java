@@ -172,7 +172,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
-
+        setPixelPositions();
     }
 
     @Override
@@ -241,20 +241,20 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         if (Restaurant.locationFilter)
             for (Restaurant res : restaurants) {
                 PixelPosition marker = MapRasterTiles.getPixelPosition(res.location.coordinates[0], res.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-                batch.draw(restaurantIcon, marker.x - 48, marker.y, 48, 48);
+                batch.draw(restaurantIcon, marker.x - 24, marker.y - 24, 48, 48);
             }
 
         if (Bar.locationFilter)
             for (Bar bar : bars) {
                 PixelPosition marker = MapRasterTiles.getPixelPosition(bar.location.coordinates[0], bar.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-                batch.draw(barIcon, marker.x - 40, marker.y, 48, 48);
+                batch.draw(barIcon, marker.x - 24, marker.y - 24, 48, 48);
             }
 
         if (Faculty.locationFilter)
             for (Faculty faculty : faculties) {
 //                if (faculty.facultyType == FacultyType.POINT) {
-                    PixelPosition marker = MapRasterTiles.getPixelPosition(faculty.lat, faculty.lon, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-                    batch.draw(facultyIcon, marker.x - 40, marker.y, 48, 48);
+                PixelPosition marker = MapRasterTiles.getPixelPosition(faculty.lat, faculty.lon, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+                batch.draw(facultyIcon, marker.x - 24, marker.y - 24, 48, 48);
 //                }
             }
 
@@ -278,6 +278,20 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         shapeRenderer.end();
     }
 
+    private void setPixelPositions() {
+        for (Restaurant res : restaurants)
+            res.pixelPos = MapRasterTiles.getPixelPosition(res.location.coordinates[0], res.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+
+        for (Bar bar : bars)
+            bar.pixelPos = MapRasterTiles.getPixelPosition(bar.location.coordinates[0], bar.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+
+        for (Faculty faculty : faculties)
+            faculty.pixelPos = MapRasterTiles.getPixelPosition(faculty.lat, faculty.lon, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+
+        for (Wifi wifi : wifi)
+            wifi.pixelPos = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+    }
+
     @Override
     public void dispose() {
         batch.dispose();
@@ -296,6 +310,26 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         Vector3 tmp_unproject = camera.unproject(new Vector3(x, y, 0));
         Location tap_geolocation = MapRasterTiles.getGeolocation((int) tmp_unproject.x, (int) tmp_unproject.y, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
         Text.updateGeolocation(tap_geolocation);
+
+        setPixelPositions();
+        PixelPosition pixelPosition = new PixelPosition((int) tmp_unproject.x, (int) tmp_unproject.y);
+        Text.resetDisplayName();
+        if (Restaurant.locationFilter)
+            for (Restaurant res : restaurants)
+                if (pixelPosition.inTouchRange(res.pixelPos))
+                    Text.updateDisplayName(res.name);
+        if (Bar.locationFilter)
+            for (Bar bar : bars)
+                if (pixelPosition.inTouchRange(bar.pixelPos))
+                    Text.updateDisplayName(bar.name);
+        if (Faculty.locationFilter)
+            for (Faculty faculty : faculties)
+                if (pixelPosition.inTouchRange(faculty.pixelPos))
+                    Text.updateDisplayName(faculty.display_name);
+        if (Wifi.locationFilter)
+            for (Wifi wifi : wifi)
+                if (pixelPosition.inTouchRange(wifi.pixelPos))
+                    Text.updateDisplayName(wifi.name);
         return false;
     }
 
