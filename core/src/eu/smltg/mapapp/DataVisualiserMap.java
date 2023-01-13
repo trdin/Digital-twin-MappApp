@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
@@ -39,6 +40,7 @@ import eu.smltg.mapapp.locations.Faculty;
 import eu.smltg.mapapp.locations.FacultyType;
 import eu.smltg.mapapp.locations.Location;
 import eu.smltg.mapapp.locations.Park;
+import eu.smltg.mapapp.locations.People;
 import eu.smltg.mapapp.locations.Restaurant;
 import eu.smltg.mapapp.locations.Wifi;
 import eu.smltg.mapapp.utils.Assets;
@@ -58,6 +60,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     Texture wifiIcon;
     Texture barIcon;
     Texture facultyIcon;
+    Texture peopleIcon;
 
     private AssetManager assetManager;
 
@@ -87,6 +90,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private Wifi[] wifi;
     private Dorm[] dorms;
     private Bar[] bars;
+    private People[] people;
 
     private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
@@ -132,6 +136,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         wifiIcon = new Texture(Gdx.files.internal("wifi.png"));
         restaurantIcon = new Texture(Gdx.files.internal("restaurant.png"));
         facultyIcon = new Texture(Gdx.files.internal("faculty.png"));
+        peopleIcon = new Texture(Gdx.files.internal("people.png"));
 
         try {
             restaurants = Restaurant.getRestaurantsAPI();
@@ -140,6 +145,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             wifi = Wifi.getWifiAPI();
             dorms = Dorm.getDormAPI();
             bars = Bar.getBarsAPI();
+            people = People.getPeopleAPI();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -257,6 +263,11 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
                 batch.draw(facultyIcon, marker.x - 24, marker.y - 24, 48, 48);
 //                }
             }
+
+        for(People people: people) {
+            PixelPosition marker = MapRasterTiles.getPixelPosition(people.location.coordinates[0], people.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+            batch.draw(peopleIcon,marker.x - 24, marker.y - 24, 48, 48);
+        }
 
         if (Wifi.locationFilter)
             for (Wifi wifi : wifi) {
