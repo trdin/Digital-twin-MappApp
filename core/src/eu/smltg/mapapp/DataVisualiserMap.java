@@ -301,6 +301,10 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
         for (Wifi wifi : wifi)
             wifi.pixelPos = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+
+        for(People people: people){
+            people.pixelPos = MapRasterTiles.getPixelPosition(people.location.coordinates[0], people.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+        }
     }
 
     @Override
@@ -341,6 +345,13 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             for (Wifi wifi : wifi)
                 if (pixelPosition.inTouchRange(wifi.pixelPos))
                     Text.updateDisplayName(wifi.name);
+//        if(People.locationFilter){
+            for(People people: people){
+                if(pixelPosition.inTouchRange(people.pixelPos)){
+                    Text.updateDisplayName(people.people);
+                }
+            }
+//        }
         return false;
     }
 

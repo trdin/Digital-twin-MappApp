@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 
 import eu.smltg.mapapp.Const;
+import eu.smltg.mapapp.utils.PixelPosition;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -12,9 +13,12 @@ import okhttp3.Response;
 
 public class People {
 
+    public static boolean locationFilter = true;
     public Location location;
-    public String number;
+    public String people; //Number of people
     public String time;
+
+    public PixelPosition pixelPos;
 
     public static People[] getPeopleAPI() throws IOException {
         OkHttpClient client = new OkHttpClient();
