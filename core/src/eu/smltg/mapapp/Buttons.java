@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import eu.smltg.mapapp.locations.Bar;
 import eu.smltg.mapapp.locations.Dorm;
 import eu.smltg.mapapp.locations.Faculty;
+import eu.smltg.mapapp.locations.Noise;
 import eu.smltg.mapapp.locations.Park;
 import eu.smltg.mapapp.locations.People;
 import eu.smltg.mapapp.locations.Restaurant;
@@ -53,6 +54,12 @@ public class Buttons {
             }
         }, skin);
 
+        TextButton noiseButton = newUiButton("Noises", new Runnable() {
+            public void run() {
+                Noise.locationFilter = !Noise.locationFilter;
+            }
+        }, skin);
+
         TextButton parkButton = newUiButton("Parks", new Runnable() {
             public void run() {
                 Park.locationFilter = !Park.locationFilter;
@@ -70,6 +77,7 @@ public class Buttons {
         addUiBtnToMainTable(barButton);
         addUiBtnToMainTable(wifiButton);
         addUiBtnToMainTable(facultyButton);
+        addUiBtnToMainTable(noiseButton);
         buttonTable.row();
         addUiBtnToMainTable(dormButton);
         addUiBtnToMainTable(parkButton);
