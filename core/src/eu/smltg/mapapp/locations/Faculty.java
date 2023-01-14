@@ -21,7 +21,7 @@ import sun.security.util.ArrayUtil;
 
 //TODO points markers for faculties and than polygons for the actua buildings
 public class Faculty {
-    public static boolean locationFilter = true;
+    public static boolean locationFilter = false;
 
     public String display_name;
 

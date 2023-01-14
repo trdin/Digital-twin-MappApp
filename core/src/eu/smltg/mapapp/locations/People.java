@@ -13,7 +13,7 @@ import okhttp3.Response;
 
 public class People {
 
-    public static boolean locationFilter = true;
+    public static boolean locationFilter = false;
     public Location location;
     public String people; //Number of people
     public String time;

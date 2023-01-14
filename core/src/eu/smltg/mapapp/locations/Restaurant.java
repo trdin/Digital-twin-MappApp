@@ -14,7 +14,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class Restaurant {
-    public static boolean locationFilter = true;
+    public static boolean locationFilter = false;
 
     public Location location;
     public String _id;
