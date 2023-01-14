@@ -13,7 +13,7 @@ import okhttp3.Response;
 
 public class People {
 
-    public static boolean locationFilter = true;
+    public static boolean locationFilter = false;
     public Location location;
     public String people; //Number of people
     public String time;
@@ -29,7 +29,7 @@ public class People {
         Call call = client.newCall(request);
         Response response = call.execute();
 
-        if(response.body() != null) {
+        if(response.body() != null && response.code() == 200) {
             String responseString = response.body().string();
             Gson gson = new Gson();
 

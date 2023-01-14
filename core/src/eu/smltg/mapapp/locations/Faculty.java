@@ -21,7 +21,7 @@ import sun.security.util.ArrayUtil;
 
 //TODO points markers for faculties and than polygons for the actua buildings
 public class Faculty {
-    public static boolean locationFilter = true;
+    public static boolean locationFilter = false;
 
     public String display_name;
 
@@ -62,7 +62,7 @@ public class Faculty {
         Call call = client.newCall(request);
         Response response = call.execute();
 
-        if (response.body() != null) {
+        if (response.body() != null && response.code() == 200) {
             String responseRes = response.body().string();
             JSONArray jsonArray = new JSONArray(responseRes);
 

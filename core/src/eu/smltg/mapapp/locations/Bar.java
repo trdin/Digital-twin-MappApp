@@ -13,7 +13,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class Bar {
-    public static boolean locationFilter = true;
+    public static boolean locationFilter = false;
 
     public String place_id;
     public String name;
@@ -32,7 +32,7 @@ public class Bar {
         Call call = client.newCall(request);
         Response response = call.execute();
 
-        if(response.body() != null) {
+        if(response.body() != null && response.code() == 200) {
             String responseString = response.body().string();
             Gson gson = new Gson();
 
