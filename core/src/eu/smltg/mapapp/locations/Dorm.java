@@ -46,7 +46,7 @@ public class Dorm {
         Call call = client.newCall(request);
         Response response = call.execute();
 
-        if(response.body() != null) {
+        if(response.body() != null && response.code() == 200) {
             String responseString = response.body().string();
             Gson gson = new Gson();
 
