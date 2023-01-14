@@ -33,12 +33,20 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 import eu.smltg.mapapp.locations.Bar;
 import eu.smltg.mapapp.locations.Dorm;
 import eu.smltg.mapapp.locations.Faculty;
 import eu.smltg.mapapp.locations.FacultyType;
 import eu.smltg.mapapp.locations.Location;
+import eu.smltg.mapapp.locations.Noise;
 import eu.smltg.mapapp.locations.Park;
 import eu.smltg.mapapp.locations.People;
 import eu.smltg.mapapp.locations.Restaurant;
@@ -61,6 +69,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     Texture barIcon;
     Texture facultyIcon;
     Texture peopleIcon;
+    Texture noiseIcon;
 
     private AssetManager assetManager;
 
@@ -91,6 +100,8 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
     private Dorm[] dorms;
     private Bar[] bars;
     private People[] people;
+    private Noise[] noises;
+    private List<Noise> markedNoises;
 
     private static final Logger log = new Logger(DataVisualiserMap.class.getSimpleName(), Logger.DEBUG);
 
@@ -137,6 +148,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         restaurantIcon = new Texture(Gdx.files.internal("restaurant.png"));
         facultyIcon = new Texture(Gdx.files.internal("faculty.png"));
         peopleIcon = new Texture(Gdx.files.internal("people.png"));
+        noiseIcon = new Texture(Gdx.files.internal("noise.png"));
 
         try {
             restaurants = Restaurant.getRestaurantsAPI();
@@ -146,7 +158,11 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             dorms = Dorm.getDormAPI();
             bars = Bar.getBarsAPI();
             people = People.getPeopleAPI();
-        } catch (IOException e) {
+            noises = Noise.getNoiseBlockchainAPI();
+            markedNoises = new ArrayList<>();
+            parseNoiseDate();
+            filterNoises();
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
@@ -180,6 +196,7 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 
         setPixelPositions();
     }
+
 
     @Override
     public void render() {
@@ -275,6 +292,12 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
                 PixelPosition marker = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
                 batch.draw(wifiIcon, marker.x - 24, marker.y - 24, 48, 48);
             }
+        if (Noise.locationFilter)
+            for (Noise noise : markedNoises) {
+                PixelPosition marker = MapRasterTiles.getPixelPosition(noise.lat, noise.lon, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+                batch.draw(noiseIcon, marker.x - noiseIcon.getWidth() / 2f, marker.y - noiseIcon.getHeight() / 2f);
+            }
+
         batch.end();
         if (Wifi.locationFilter)
             drawWifiRange();
@@ -306,6 +329,45 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         for (People people : people)
             people.pixelPos = MapRasterTiles.getPixelPosition(people.location.coordinates[0], people.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
 
+        for (Noise noise : markedNoises) {
+            noise.pixelPos = MapRasterTiles.getPixelPosition(noise.lat, noise.lon, MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+        }
+    }
+
+    public void parseNoiseDate() throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+        if(noises.length != 0) {
+            for (Noise noise : noises) {
+                noise.dateTime = simpleDateFormat.parse(noise.time);
+            }
+        }
+    }
+
+    public void filterNoises() {
+
+        for (Noise noise : noises) {
+            boolean added = false;
+            if (!markedNoises.isEmpty()) {
+                for (Iterator<Noise> it = markedNoises.iterator(); it.hasNext(); ) {
+                    Noise markedNoise = it.next();
+                    if (noisesNear(noise, markedNoise)) {
+                        if (noise.dateTime.compareTo(markedNoise.dateTime) > 0) {
+                            markedNoises.remove(markedNoise);
+                            markedNoises.add(noise);
+                            added = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!added) {
+                markedNoises.add(noise);
+            }
+        }
+    }
+
+    public boolean noisesNear(Noise noise1, Noise noise2) {
+        return Math.abs(noise1.lat - noise2.lat) <= 0.0003 && Math.abs(noise1.lon - noise2.lon) <= 0.0003;
     }
 
     @Override
@@ -354,6 +416,26 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             for (People people : people)
                 if (pixelPosition.inTouchRange(people.pixelPos))
                     Text.updateDisplayName("Number of people: " + people.people);
+
+        if (Noise.locationFilter) {
+            for (Noise noise : markedNoises) {
+                String noiseDescription;
+                if (pixelPosition.inTouchRange(noise.pixelPos)) {
+                    if (noise.noise <= 35.0) {
+                        noiseDescription = "Exceptional";
+                    } else if (noise.noise <= 45.0) {
+                        noiseDescription = "Excellent";
+                    } else if (noise.noise <= 50.0) {
+                        noiseDescription = "Good enough";
+                    } else if (noise.noise <= 60.0) {
+                        noiseDescription = "Noisy";
+                    } else {
+                        noiseDescription = "Loud";
+                    }
+                    Text.updateDisplayName("Study environment: " + noiseDescription);
+                }
+            }
+        }
 
         return false;
     }
