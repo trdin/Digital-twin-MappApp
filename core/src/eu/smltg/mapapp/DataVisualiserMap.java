@@ -264,10 +264,11 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
 //                }
             }
 
-        for(People people: people) {
-            PixelPosition marker = MapRasterTiles.getPixelPosition(people.location.coordinates[0], people.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-            batch.draw(peopleIcon,marker.x - 24, marker.y - 24, 48, 48);
-        }
+        if (People.locationFilter)
+            for (People people : people) {
+                PixelPosition marker = MapRasterTiles.getPixelPosition(people.location.coordinates[0], people.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
+                batch.draw(peopleIcon, marker.x - 24, marker.y - 24, 48, 48);
+            }
 
         if (Wifi.locationFilter)
             for (Wifi wifi : wifi) {
@@ -302,9 +303,9 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
         for (Wifi wifi : wifi)
             wifi.pixelPos = MapRasterTiles.getPixelPosition(wifi.location.coordinates[0], wifi.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
 
-        for(People people: people){
+        for (People people : people)
             people.pixelPos = MapRasterTiles.getPixelPosition(people.location.coordinates[0], people.location.coordinates[1], MapRasterTiles.TILE_SIZE, ZOOM, beginTile.x, beginTile.y, HEIGHT);
-        }
+
     }
 
     @Override
@@ -333,25 +334,27 @@ public class DataVisualiserMap extends ApplicationAdapter implements GestureDete
             for (Restaurant res : restaurants)
                 if (pixelPosition.inTouchRange(res.pixelPos))
                     Text.updateDisplayName(res.name);
+
         if (Bar.locationFilter)
             for (Bar bar : bars)
                 if (pixelPosition.inTouchRange(bar.pixelPos))
                     Text.updateDisplayName(bar.name);
+
         if (Faculty.locationFilter)
             for (Faculty faculty : faculties)
                 if (pixelPosition.inTouchRange(faculty.pixelPos))
                     Text.updateDisplayName(faculty.display_name);
+
         if (Wifi.locationFilter)
             for (Wifi wifi : wifi)
                 if (pixelPosition.inTouchRange(wifi.pixelPos))
                     Text.updateDisplayName(wifi.name);
-//        if(People.locationFilter){
-            for(People people: people){
-                if(pixelPosition.inTouchRange(people.pixelPos)){
-                    Text.updateDisplayName(people.people);
-                }
-            }
-//        }
+
+        if (People.locationFilter)
+            for (People people : people)
+                if (pixelPosition.inTouchRange(people.pixelPos))
+                    Text.updateDisplayName("Number of people: " + people.people);
+
         return false;
     }
 

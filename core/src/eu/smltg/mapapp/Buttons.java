@@ -11,6 +11,7 @@ import eu.smltg.mapapp.locations.Bar;
 import eu.smltg.mapapp.locations.Dorm;
 import eu.smltg.mapapp.locations.Faculty;
 import eu.smltg.mapapp.locations.Park;
+import eu.smltg.mapapp.locations.People;
 import eu.smltg.mapapp.locations.Restaurant;
 import eu.smltg.mapapp.locations.Wifi;
 
@@ -22,13 +23,13 @@ public class Buttons {
         Table table = new Table();
         table.defaults().pad(0);
 
-        TextButton BarButton = newUiButton("Bars", new Runnable() {
+        TextButton barButton = newUiButton("Bars", new Runnable() {
             public void run() {
                 Bar.locationFilter = !Bar.locationFilter;
             }
         }, skin);
 
-        TextButton RestaurantButton = newUiButton("Restaurants", new Runnable() {
+        TextButton restaurantButton = newUiButton("Restaurants", new Runnable() {
             public void run() {
                 Restaurant.locationFilter = !Restaurant.locationFilter;
             }
@@ -57,17 +58,23 @@ public class Buttons {
                 Park.locationFilter = !Park.locationFilter;
             }
         }, skin);
+        TextButton peopleButton = newUiButton("People", new Runnable() {
+            public void run() {
+                People.locationFilter = !People.locationFilter;
+            }
+        }, skin);
 
         buttonTable = new Table();
         buttonTable.defaults().width(80).pad(5);
 
-        addUiBtnToMainTable(BarButton);
+        addUiBtnToMainTable(barButton);
         addUiBtnToMainTable(wifiButton);
         addUiBtnToMainTable(facultyButton);
         buttonTable.row();
         addUiBtnToMainTable(dormButton);
         addUiBtnToMainTable(parkButton);
-        addUiBtnToMainTable(RestaurantButton);
+        addUiBtnToMainTable(restaurantButton);
+        addUiBtnToMainTable(peopleButton);
 
         buttonTable.center();
 
